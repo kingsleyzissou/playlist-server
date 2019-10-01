@@ -2,19 +2,26 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
     type Query {
-        hello: String,
-        song(id: Int!): Song,
-        artist(id: Int!): Artist
+        playlists: [Playlist]
+        playlist(_id: String): Playlist,
+        song(_id: String): Song,
+        artist(_id: String): Artist
+    }
+
+    type Playlist {
+        _id: String,
+        name: String,
+        songs: [Song]
     }
 
     type Song {
-        id: Int!,
+        _id: String,
         title: String,
         artist: Artist
     }
 
     type Artist {
-        id: Int!,
+        _id: String,
         name: String,
         songs: [Song]
     }

@@ -1,52 +1,30 @@
-import { find, filter } from 'lodash';
-
-const songs =  [
-    {
-        id: 1,
-        title: 'Piano Sonata No. 3',
-        artist: 'Beethoven'
-    },
-    {
-        id: 2,
-        title: 'Piano Sonata No. 7',
-        artist: 'Beethoven'
-    },
-    {
-        id: 3,
-        title: 'Piano Sonata No. 10',
-        artist: 'Beethoven'
-    },
-    {
-        id: 4,
-        title: 'Fur Elize',
-        artist: 'Motzart'
-    }
-];
-
-const artists = [
-    { 
-        id: 1,
-        name:  'Beethoven' 
-    },
-    { 
-        id: 2,
-        name:  'Motzart' 
-    },
-];
+import song from '../models/song';
+import artist from '../models/artist';
+import playlist from '../models/playlist';
 
 export default {
+
     Query: {
-        hello: () => 'Hello world!',
-        song: (_, { id }) => find(songs, { id }),
-        artist: (_, { id }) => find(artists, { id })
+        song: async (_, { _id }) => 
+            await song.findById({ _id }).populate(),
+        artist: async (_, { _id }) =>
+            await artist.findById({ _id }).populate(),
+        playlist: async (_, { _id }) =>
+            await playlist.findById({ _id }).populate(),
+        playlists: async () => 
+            await playlist.find({})
+    },
+
+    Playlist: {
+        songs: ({ songs }) => songs
     },
 
     Artist: {
-        songs: artist => filter(songs, { artist: artist.name })
+        songs: ({ songs }) => songs
     },
 
     Song: {
-        artist: song => find(artists, { name: song.artist })
+        artist: ({ artist }) => artist
     }
 
 };
