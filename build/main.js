@@ -617,11 +617,13 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   Query: {
+    songs: async () => await _models_song__WEBPACK_IMPORTED_MODULE_0__["default"].find({}),
     song: async (_, {
       _id
     }) => await _models_song__WEBPACK_IMPORTED_MODULE_0__["default"].findById({
       _id
     }).populate(),
+    artists: async () => await _models_artist__WEBPACK_IMPORTED_MODULE_1__["default"].find({}),
     artist: async (_, {
       _id
     }) => await _models_artist__WEBPACK_IMPORTED_MODULE_1__["default"].findById({
@@ -632,7 +634,7 @@ __webpack_require__.r(__webpack_exports__);
     }) => await _models_playlist__WEBPACK_IMPORTED_MODULE_2__["default"].findById({
       _id
     }).populate(),
-    playlists: async () => await _models_playlist__WEBPACK_IMPORTED_MODULE_2__["default"].find({})
+    playlists: async () => await _models_playlist__WEBPACK_IMPORTED_MODULE_2__["default"].find({}).exec()
   },
   Playlist: {
     songs: ({
@@ -669,7 +671,9 @@ __webpack_require__.r(__webpack_exports__);
     type Query {
         playlists: [Playlist]
         playlist(_id: String): Playlist,
+        songs: [Song],
         song(_id: String): Song,
+        artists: [Artist]
         artist(_id: String): Artist
     }
 
@@ -682,7 +686,10 @@ __webpack_require__.r(__webpack_exports__);
     type Song {
         _id: String,
         title: String,
-        artist: Artist
+        artist: Artist,
+        genre: String,
+        playcount: Int,
+        favourite: Boolean
     }
 
     type Artist {
@@ -721,6 +728,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // import Artist from './models/artist';
+// import Song from './models/song';
 
 const app = express__WEBPACK_IMPORTED_MODULE_0___default()();
 const host = 'mongodb://localhost:27017/playlist';
@@ -743,7 +752,7 @@ server.applyMiddleware({
 });
 const port = process.env.PORT || 4000;
 app.listen(port, () => {
-  console.log(`Listening on http://localhost:${port}`);
+  console.log(`Listening on http://localhost:${port}${server.graphqlPath}`);
 });
 
 /***/ }),
@@ -844,7 +853,10 @@ const songSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Artist',
     autopopulate: true
-  }
+  },
+  genre: String,
+  playcount: Number,
+  favourite: Boolean
 });
 songSchema.plugin(mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1___default.a);
 const Song = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('Song', songSchema);

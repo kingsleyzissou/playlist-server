@@ -12,7 +12,10 @@ const songSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref:'Artist',
         autopopulate: true
-    }
+    },
+    genre: String,
+    playcount: Number,
+    favourite: Boolean
 });
 
 songSchema.plugin(populate);

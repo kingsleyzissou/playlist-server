@@ -6,6 +6,8 @@ import { ApolloServer } from 'apollo-server-express';
 import typeDefs from './data/schema';
 import resolvers from './data/resolvers';
 
+// import Artist from './models/artist';
+// import Song from './models/song';
 
 const app = express();
 
@@ -30,5 +32,5 @@ server.applyMiddleware({ app });
 const port = process.env.PORT || 4000;
 
 app.listen(port, () => {
-    console.log(`Listening on http://localhost:${port}`);
+    console.log(`Listening on http://localhost:${port}${server.graphqlPath}`);
 });

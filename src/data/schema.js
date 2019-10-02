@@ -4,7 +4,9 @@ export default gql`
     type Query {
         playlists: [Playlist]
         playlist(_id: String): Playlist,
+        songs: [Song],
         song(_id: String): Song,
+        artists: [Artist]
         artist(_id: String): Artist
     }
 
@@ -17,7 +19,10 @@ export default gql`
     type Song {
         _id: String,
         title: String,
-        artist: Artist
+        artist: Artist,
+        genre: String,
+        playcount: Int,
+        favourite: Boolean
     }
 
     type Artist {
