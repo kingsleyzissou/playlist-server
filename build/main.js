@@ -88,9 +88,9 @@ module.exports =
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/apollo/server.js":
+/***/ "./src/config/apollo.js":
 /*!******************************!*\
-  !*** ./src/apollo/server.js ***!
+  !*** ./src/config/apollo.js ***!
   \******************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -101,71 +101,125 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var apollo_server_express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(apollo_server_express__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _graphql_schema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../graphql/schema */ "./src/graphql/schema/index.js");
 /* harmony import */ var _graphql_resolvers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../graphql/resolvers */ "./src/graphql/resolvers/index.js");
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
-
-const server = new apollo_server_express__WEBPACK_IMPORTED_MODULE_0__["ApolloServer"]({
+/* harmony default export */ __webpack_exports__["default"] = (new apollo_server_express__WEBPACK_IMPORTED_MODULE_0__["ApolloServer"]({
   introspection: true,
   typeDefs: _graphql_schema__WEBPACK_IMPORTED_MODULE_1__["default"],
   resolvers: _graphql_resolvers__WEBPACK_IMPORTED_MODULE_2__["default"],
   formatError: error => {
-    // remove the internal sequelize error message
-    // leave only the important validation error
     const message = error.message.replace('SequelizeValidationError: ', '').replace('Validation error: ', '');
-    return _objectSpread({}, error, {
+    return { ...error,
       message
-    });
+    };
   }
-});
-/* harmony default export */ __webpack_exports__["default"] = (server);
+}));
 
 /***/ }),
 
-/***/ "./src/config/index.js":
-/*!*****************************!*\
-  !*** ./src/config/index.js ***!
-  \*****************************/
+/***/ "./src/config/config.js":
+/*!******************************!*\
+  !*** ./src/config/config.js ***!
+  \******************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var envy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! envy */ "envy");
+/* WEBPACK VAR INJECTION */(function(__dirname) {/* harmony import */ var envy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! envy */ "envy");
 /* harmony import */ var envy__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(envy__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! path */ "path");
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_1__);
 
-const config = envy__WEBPACK_IMPORTED_MODULE_0___default()();
+
+const root = path__WEBPACK_IMPORTED_MODULE_1___default.a.resolve(__dirname, '../', '../');
+const options = {
+  root,
+  public: path__WEBPACK_IMPORTED_MODULE_1___default.a.join(root, '/public'),
+  mongo: {
+    options: {
+      useCreateIndex: true,
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }
+  }
+};
+const config = { ...options,
+  ...envy__WEBPACK_IMPORTED_MODULE_0___default()()
+};
 /* harmony default export */ __webpack_exports__["default"] = (config);
+/* WEBPACK VAR INJECTION */}.call(this, "src/config"))
 
 /***/ }),
 
-/***/ "./src/database/connect.js":
-/*!*********************************!*\
-  !*** ./src/database/connect.js ***!
-  \*********************************/
+/***/ "./src/config/express.js":
+/*!*******************************!*\
+  !*** ./src/config/express.js ***!
+  \*******************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mongoose */ "mongoose");
-/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./src/config/index.js");
+/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ "express");
+/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var body_parser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! body-parser */ "body-parser");
+/* harmony import */ var body_parser__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(body_parser__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var helmet__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! helmet */ "helmet");
+/* harmony import */ var helmet__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(helmet__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./config */ "./src/config/config.js");
 
 
-/* harmony default export */ __webpack_exports__["default"] = (() => {
-  let options = {
-    useCreateIndex: true,
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  };
-  mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.connect(_config__WEBPACK_IMPORTED_MODULE_1__["default"].dbHost, options);
+
+
+/* harmony default export */ __webpack_exports__["default"] = (app => {
+  app.use(helmet__WEBPACK_IMPORTED_MODULE_2___default()());
+  app.use(express__WEBPACK_IMPORTED_MODULE_0___default.a.static(_config__WEBPACK_IMPORTED_MODULE_3__["default"].public));
+  app.use(body_parser__WEBPACK_IMPORTED_MODULE_1___default.a.urlencoded({
+    extended: true
+  }));
+  app.use(body_parser__WEBPACK_IMPORTED_MODULE_1___default.a.json());
 });
+
+/***/ }),
+
+/***/ "./src/config/logger.js":
+/*!******************************!*\
+  !*** ./src/config/logger.js ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var winston__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! winston */ "winston");
+/* harmony import */ var winston__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(winston__WEBPACK_IMPORTED_MODULE_0__);
+
+const {
+  combine,
+  colorize,
+  simple,
+  json
+} = winston__WEBPACK_IMPORTED_MODULE_0__["format"];
+const logger = Object(winston__WEBPACK_IMPORTED_MODULE_0__["createLogger"])({
+  level: 'debug',
+  format: json(),
+  transports: [new winston__WEBPACK_IMPORTED_MODULE_0__["transports"].File({
+    filename: 'error.log',
+    level: 'error'
+  }), new winston__WEBPACK_IMPORTED_MODULE_0__["transports"].File({
+    filename: 'combined.log'
+  })]
+});
+
+if (true) {
+  logger.add(new winston__WEBPACK_IMPORTED_MODULE_0__["transports"].Console({
+    format: combine(colorize(), simple())
+  }));
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (logger);
 
 /***/ }),
 
@@ -178,14 +232,14 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _models_artist__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models/artist */ "./src/models/artist.js");
+/* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models */ "./src/models/index.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   Query: {
-    artists: async () => await _models_artist__WEBPACK_IMPORTED_MODULE_0__["default"].find({}),
+    artists: async () => _models__WEBPACK_IMPORTED_MODULE_0__["artist"].find({}),
     artist: async (_, {
       _id
-    }) => await _models_artist__WEBPACK_IMPORTED_MODULE_0__["default"].findById({
+    }) => _models__WEBPACK_IMPORTED_MODULE_0__["artist"].findById({
       _id
     })
   },
@@ -226,16 +280,16 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _models_playlist__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models/playlist */ "./src/models/playlist.js");
+/* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models */ "./src/models/index.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   Query: {
     playlist: async (_, {
       _id
-    }) => await _models_playlist__WEBPACK_IMPORTED_MODULE_0__["default"].findById({
+    }) => _models__WEBPACK_IMPORTED_MODULE_0__["playlist"].findById({
       _id
     }),
-    playlists: async () => await _models_playlist__WEBPACK_IMPORTED_MODULE_0__["default"].find({})
+    playlists: async () => _models__WEBPACK_IMPORTED_MODULE_0__["playlist"].find({})
   },
   Playlist: {
     songs: ({
@@ -255,16 +309,16 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _models_song__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models/song */ "./src/models/song.js");
+/* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models */ "./src/models/index.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   Query: {
-    songs: async () => await _models_song__WEBPACK_IMPORTED_MODULE_0__["default"].find({}),
+    songs: async () => _models__WEBPACK_IMPORTED_MODULE_0__["song"].find({}).populate(),
     song: async (_, {
       _id
-    }) => await _models_song__WEBPACK_IMPORTED_MODULE_0__["default"].findById({
+    }) => _models__WEBPACK_IMPORTED_MODULE_0__["song"].findById({
       _id
-    })
+    }).populate()
   },
   Song: {
     artist: ({
@@ -289,16 +343,16 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = (apollo_server_express__WEBPACK_IMPORTED_MODULE_0__["gql"]`
 
-    extend type Query {
-        artists: [Artist]
-        artist(_id: String): Artist
-    }
+  extend type Query {
+    artists: [Artist]
+    artist(_id: String): Artist
+  }
 
-    type Artist {
-        _id: String,
-        name: String,
-        songs: [Song]
-    }
+  type Artist {
+    _id: String,
+    name: String,
+    songs: [Song]
+  }
 
 `);
 
@@ -324,9 +378,9 @@ __webpack_require__.r(__webpack_exports__);
 
 const schema = apollo_server_express__WEBPACK_IMPORTED_MODULE_0__["gql"]`
 
-    type Query {
-        hello: String
-    }
+  type Query {
+    hello: String
+  }
 
 `;
 /* harmony default export */ __webpack_exports__["default"] = ([schema, _song__WEBPACK_IMPORTED_MODULE_3__["default"], _artist__WEBPACK_IMPORTED_MODULE_2__["default"], _playlist__WEBPACK_IMPORTED_MODULE_1__["default"]]);
@@ -347,16 +401,16 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = (apollo_server_express__WEBPACK_IMPORTED_MODULE_0__["gql"]`
 
-    extend type Query {
-        playlists: [Playlist]
-        playlist(_id: String): Playlist
-    }
+  extend type Query {
+    playlists: [Playlist]
+    playlist(_id: String): Playlist
+  }
 
-    type Playlist {
-        _id: String,
-        name: String,
-        songs: [Song]
-    }
+  type Playlist {
+    _id: String,
+    name: String,
+    songs: [Song]
+  }
 
 `);
 
@@ -376,19 +430,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = (apollo_server_express__WEBPACK_IMPORTED_MODULE_0__["gql"]`
 
-    extend type Query {
-        songs: [Song],
-        song(_id: String): Song,
-    }
+  extend type Query {
+    songs: [Song],
+    song(_id: String): Song,
+  }
 
-    type Song {
-        _id: String,
-        title: String,
-        artist: Artist,
-        genre: String,
-        playcount: Int,
-        favourite: Boolean
-    }
+  type Song {
+    _id: String,
+    title: String,
+    artist: Artist,
+    genre: String,
+    playcount: Int,
+    favourite: Boolean
+  }
 
 `);
 
@@ -405,22 +459,40 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ "express");
 /* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _apollo_server__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./apollo/server */ "./src/apollo/server.js");
-/* harmony import */ var _database_connect__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./database/connect */ "./src/database/connect.js");
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./config */ "./src/config/index.js");
+/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! mongoose */ "mongoose");
+/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _config_apollo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./config/apollo */ "./src/config/apollo.js");
+/* harmony import */ var _config_config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./config/config */ "./src/config/config.js");
+/* harmony import */ var _config_logger__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./config/logger */ "./src/config/logger.js");
+/* harmony import */ var _config_express__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./config/express */ "./src/config/express.js");
+
+
+ // import connect from './config/connection';
 
 
 
 
 const app = express__WEBPACK_IMPORTED_MODULE_0___default()();
-Object(_database_connect__WEBPACK_IMPORTED_MODULE_2__["default"])();
-_apollo_server__WEBPACK_IMPORTED_MODULE_1__["default"].applyMiddleware({
-  app
+const port = _config_config__WEBPACK_IMPORTED_MODULE_3__["default"].port || 4000;
+
+const connect = () => {
+  mongoose__WEBPACK_IMPORTED_MODULE_1___default.a.connect(_config_config__WEBPACK_IMPORTED_MODULE_3__["default"].dbHost, _config_config__WEBPACK_IMPORTED_MODULE_3__["default"].mongo.options);
+  return mongoose__WEBPACK_IMPORTED_MODULE_1___default.a.connection;
+};
+
+const listen = () => {
+  if (app.get('env') === 'test') return;
+  app.listen(port);
+  _config_logger__WEBPACK_IMPORTED_MODULE_4__["default"].info(`App started on http://localhost:${port}`);
+};
+
+const connection = connect();
+Object(_config_express__WEBPACK_IMPORTED_MODULE_5__["default"])(app);
+_config_apollo__WEBPACK_IMPORTED_MODULE_2__["default"].applyMiddleware({
+  app,
+  path: '/graphql'
 });
-const port = _config__WEBPACK_IMPORTED_MODULE_3__["default"].port || 4000;
-app.listen(port, () => {
-  console.log(`Listening on http://localhost:${port}${_apollo_server__WEBPACK_IMPORTED_MODULE_1__["default"].graphqlPath}`);
-});
+connection.on('error', err => _config_logger__WEBPACK_IMPORTED_MODULE_4__["default"].error(err)).on('disconnected', connect).on('open', listen);
 
 /***/ }),
 
@@ -439,7 +511,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1__);
 
 
-const Schema = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.Schema;
+const {
+  Schema
+} = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a;
 const artistSchema = new Schema({
   name: {
     type: String,
@@ -454,6 +528,31 @@ const artistSchema = new Schema({
 artistSchema.plugin(mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1___default.a);
 const Artist = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('Artist', artistSchema);
 /* harmony default export */ __webpack_exports__["default"] = (Artist);
+
+/***/ }),
+
+/***/ "./src/models/index.js":
+/*!*****************************!*\
+  !*** ./src/models/index.js ***!
+  \*****************************/
+/*! exports provided: song, playlist, artist */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _playlist__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./playlist */ "./src/models/playlist.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "playlist", function() { return _playlist__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+
+/* harmony import */ var _artist__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./artist */ "./src/models/artist.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "artist", function() { return _artist__WEBPACK_IMPORTED_MODULE_1__["default"]; });
+
+/* harmony import */ var _song__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./song */ "./src/models/song.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "song", function() { return _song__WEBPACK_IMPORTED_MODULE_2__["default"]; });
+
+
+
+
+
 
 /***/ }),
 
@@ -472,7 +571,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1__);
 
 
-const Schema = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.Schema;
+const {
+  Schema
+} = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a;
 const playlistSchema = new Schema({
   id: {
     type: Number,
@@ -510,7 +611,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1__);
 
 
-const Schema = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.Schema;
+const {
+  Schema
+} = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a;
 const songSchema = new Schema({
   title: {
     type: String,
@@ -554,6 +657,17 @@ module.exports = require("apollo-server-express");
 
 /***/ }),
 
+/***/ "body-parser":
+/*!******************************!*\
+  !*** external "body-parser" ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("body-parser");
+
+/***/ }),
+
 /***/ "envy":
 /*!***********************!*\
   !*** external "envy" ***!
@@ -576,6 +690,17 @@ module.exports = require("express");
 
 /***/ }),
 
+/***/ "helmet":
+/*!*************************!*\
+  !*** external "helmet" ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("helmet");
+
+/***/ }),
+
 /***/ "mongoose":
 /*!***************************!*\
   !*** external "mongoose" ***!
@@ -595,6 +720,28 @@ module.exports = require("mongoose");
 /***/ (function(module, exports) {
 
 module.exports = require("mongoose-autopopulate");
+
+/***/ }),
+
+/***/ "path":
+/*!***********************!*\
+  !*** external "path" ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
+
+/***/ }),
+
+/***/ "winston":
+/*!**************************!*\
+  !*** external "winston" ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("winston");
 
 /***/ })
 
