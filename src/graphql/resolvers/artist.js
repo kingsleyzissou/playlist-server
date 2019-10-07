@@ -1,10 +1,10 @@
-import { artist } from '../../models';
+import Artist from '../../models/artist';
 
 export default {
 
   Query: {
-    artists: async () => artist.find({}),
-    artist: async (_, { _id }) => artist.findById({ _id }),
+    artists: async () => Artist.find({}),
+    artist: async (_, { _id }) => Artist.findById({ _id }),
   },
 
   Artist: {

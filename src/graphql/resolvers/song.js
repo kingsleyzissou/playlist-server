@@ -1,10 +1,10 @@
-import { song } from '../../models';
+import Song from '../../models/song';
 
 export default {
 
   Query: {
-    songs: async () => song.find({}).populate(),
-    song: async (_, { _id }) => song.findById({ _id }).populate(),
+    songs: async () => Song.find({}).populate(),
+    song: async (_, { _id }) => Song.findById({ _id }).populate(),
   },
 
   Song: {

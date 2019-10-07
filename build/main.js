@@ -88,55 +88,81 @@ module.exports =
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/config/apollo.js":
-/*!******************************!*\
-  !*** ./src/config/apollo.js ***!
-  \******************************/
+/***/ "./src/api/routes/index.js":
+/*!*********************************!*\
+  !*** ./src/api/routes/index.js ***!
+  \*********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var apollo_server_express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! apollo-server-express */ "apollo-server-express");
-/* harmony import */ var apollo_server_express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(apollo_server_express__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _graphql_schema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../graphql/schema */ "./src/graphql/schema/index.js");
-/* harmony import */ var _graphql_resolvers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../graphql/resolvers */ "./src/graphql/resolvers/index.js");
+/* harmony import */ var jsonwebtoken__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jsonwebtoken */ "jsonwebtoken");
+/* harmony import */ var jsonwebtoken__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jsonwebtoken__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../config */ "./src/config/index.js");
 
 
-
-/* harmony default export */ __webpack_exports__["default"] = (new apollo_server_express__WEBPACK_IMPORTED_MODULE_0__["ApolloServer"]({
-  introspection: true,
-  typeDefs: _graphql_schema__WEBPACK_IMPORTED_MODULE_1__["default"],
-  resolvers: _graphql_resolvers__WEBPACK_IMPORTED_MODULE_2__["default"],
-  formatError: error => {
-    const message = error.message.replace('SequelizeValidationError: ', '').replace('Validation error: ', '');
-    return { ...error,
-      message
-    };
-  }
-}));
+/* harmony default export */ __webpack_exports__["default"] = ((app, passport) => {
+  app.get('/', (req, res) => {
+    res.send({
+      message: 'Hello world'
+    });
+  });
+  app.get('/login', (req, res) => {
+    res.send({
+      message: 'Cool beans'
+    });
+  });
+  app.post('/login', (req, res, next) => {
+    passport.authenticate('local', (err, user) => {
+      if (err) return next(err);
+      if (!user) res.send({
+        message: 'Failed to sign in'
+      });
+      const token = jsonwebtoken__WEBPACK_IMPORTED_MODULE_0___default.a.sign(user.toJSON(), _config__WEBPACK_IMPORTED_MODULE_1__["default"].jwtSecret);
+      return res.status(201).send({
+        message: 'Success',
+        user,
+        token
+      });
+    })(req, res, next);
+  });
+  app.get('/paywall', (req, res, next) => {
+    passport.authenticate('jwt', {
+      session: false
+    }, (err, user) => {
+      if (err) return next(err);
+      return res.status(201).send({
+        message: 'Success',
+        user
+      });
+    })(req, res, next);
+  });
+});
 
 /***/ }),
 
-/***/ "./src/config/config.js":
-/*!******************************!*\
-  !*** ./src/config/config.js ***!
-  \******************************/
+/***/ "./src/config/index.js":
+/*!*****************************!*\
+  !*** ./src/config/index.js ***!
+  \*****************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(__dirname) {/* harmony import */ var envy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! envy */ "envy");
-/* harmony import */ var envy__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(envy__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! path */ "path");
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_1__);
+/* WEBPACK VAR INJECTION */(function(__dirname) {/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! path */ "path");
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! dotenv */ "dotenv");
+/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dotenv__WEBPACK_IMPORTED_MODULE_1__);
 
 
-const root = path__WEBPACK_IMPORTED_MODULE_1___default.a.resolve(__dirname, '../', '../');
-const options = {
-  root,
-  public: path__WEBPACK_IMPORTED_MODULE_1___default.a.join(root, '/public'),
+dotenv__WEBPACK_IMPORTED_MODULE_1___default.a.config();
+/* harmony default export */ __webpack_exports__["default"] = ({
+  port: process.env.PORT || 4000,
+  root: path__WEBPACK_IMPORTED_MODULE_0___default.a.resolve(__dirname, '../', '../'),
+  dbHost: process.env.DB_HOST,
+  jwtSecret: process.env.JWT_SECRET,
   mongo: {
     options: {
       useCreateIndex: true,
@@ -144,82 +170,70 @@ const options = {
       useUnifiedTopology: true
     }
   }
-};
-const config = { ...options,
-  ...envy__WEBPACK_IMPORTED_MODULE_0___default()()
-};
-/* harmony default export */ __webpack_exports__["default"] = (config);
+});
 /* WEBPACK VAR INJECTION */}.call(this, "src/config"))
 
 /***/ }),
 
-/***/ "./src/config/express.js":
-/*!*******************************!*\
-  !*** ./src/config/express.js ***!
-  \*******************************/
+/***/ "./src/config/passport/jwt.js":
+/*!************************************!*\
+  !*** ./src/config/passport/jwt.js ***!
+  \************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ "express");
-/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var body_parser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! body-parser */ "body-parser");
-/* harmony import */ var body_parser__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(body_parser__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var helmet__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! helmet */ "helmet");
-/* harmony import */ var helmet__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(helmet__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./config */ "./src/config/config.js");
+/* harmony import */ var passport_jwt__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! passport-jwt */ "passport-jwt");
+/* harmony import */ var passport_jwt__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(passport_jwt__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _models_user__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../models/user */ "./src/models/user.js");
+/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../index */ "./src/config/index.js");
+/* harmony import */ var _utilities_logger__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utilities/logger */ "./src/utilities/logger.js");
 
 
 
 
-/* harmony default export */ __webpack_exports__["default"] = (app => {
-  app.use(helmet__WEBPACK_IMPORTED_MODULE_2___default()());
-  app.use(express__WEBPACK_IMPORTED_MODULE_0___default.a.static(_config__WEBPACK_IMPORTED_MODULE_3__["default"].public));
-  app.use(body_parser__WEBPACK_IMPORTED_MODULE_1___default.a.urlencoded({
-    extended: true
-  }));
-  app.use(body_parser__WEBPACK_IMPORTED_MODULE_1___default.a.json());
+const options = {
+  jwtFromRequest: passport_jwt__WEBPACK_IMPORTED_MODULE_0__["ExtractJwt"].fromAuthHeaderAsBearerToken(),
+  secretOrKey: _index__WEBPACK_IMPORTED_MODULE_2__["default"].jwtSecret
+};
+const strategy = new passport_jwt__WEBPACK_IMPORTED_MODULE_0__["Strategy"](options, async (payload, done) => {
+  const user = await _models_user__WEBPACK_IMPORTED_MODULE_1__["default"].findById(payload._id).catch(err => _utilities_logger__WEBPACK_IMPORTED_MODULE_3__["default"].error(err));
+  if (!user) return done(null, false);
+  return done(null, user);
 });
+/* harmony default export */ __webpack_exports__["default"] = (strategy);
 
 /***/ }),
 
-/***/ "./src/config/logger.js":
-/*!******************************!*\
-  !*** ./src/config/logger.js ***!
-  \******************************/
+/***/ "./src/config/passport/local.js":
+/*!**************************************!*\
+  !*** ./src/config/passport/local.js ***!
+  \**************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var winston__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! winston */ "winston");
-/* harmony import */ var winston__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(winston__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var passport_local__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! passport-local */ "passport-local");
+/* harmony import */ var passport_local__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(passport_local__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _models_user__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../models/user */ "./src/models/user.js");
 
-const {
-  combine,
-  colorize,
-  simple,
-  json
-} = winston__WEBPACK_IMPORTED_MODULE_0__["format"];
-const logger = Object(winston__WEBPACK_IMPORTED_MODULE_0__["createLogger"])({
-  level: 'debug',
-  format: json(),
-  transports: [new winston__WEBPACK_IMPORTED_MODULE_0__["transports"].File({
-    filename: 'error.log',
-    level: 'error'
-  }), new winston__WEBPACK_IMPORTED_MODULE_0__["transports"].File({
-    filename: 'combined.log'
-  })]
+
+const login = new passport_local__WEBPACK_IMPORTED_MODULE_0___default.a({
+  usernameField: 'username',
+  passwordField: 'password',
+  session: false
+}, async (username, password, done) => {
+  const user = await _models_user__WEBPACK_IMPORTED_MODULE_1__["default"].findOne({
+    username
+  }).catch(err => done(err));
+  if (!user) return done(null, false);
+  const verified = user.verifyPassword(password, user.password);
+  if (!verified) return done(null, false);
+  return done(null, user);
 });
-
-if (true) {
-  logger.add(new winston__WEBPACK_IMPORTED_MODULE_0__["transports"].Console({
-    format: combine(colorize(), simple())
-  }));
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (logger);
+/* harmony default export */ __webpack_exports__["default"] = (login);
 
 /***/ }),
 
@@ -232,14 +246,14 @@ if (true) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models */ "./src/models/index.js");
+/* harmony import */ var _models_artist__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models/artist */ "./src/models/artist.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   Query: {
-    artists: async () => _models__WEBPACK_IMPORTED_MODULE_0__["artist"].find({}),
+    artists: async () => _models_artist__WEBPACK_IMPORTED_MODULE_0__["default"].find({}),
     artist: async (_, {
       _id
-    }) => _models__WEBPACK_IMPORTED_MODULE_0__["artist"].findById({
+    }) => _models_artist__WEBPACK_IMPORTED_MODULE_0__["default"].findById({
       _id
     })
   },
@@ -280,16 +294,16 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models */ "./src/models/index.js");
+/* harmony import */ var _models_playlist__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models/playlist */ "./src/models/playlist.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   Query: {
     playlist: async (_, {
       _id
-    }) => _models__WEBPACK_IMPORTED_MODULE_0__["playlist"].findById({
+    }) => _models_playlist__WEBPACK_IMPORTED_MODULE_0__["default"].findById({
       _id
     }),
-    playlists: async () => _models__WEBPACK_IMPORTED_MODULE_0__["playlist"].find({})
+    playlists: async () => _models_playlist__WEBPACK_IMPORTED_MODULE_0__["default"].find({})
   },
   Playlist: {
     songs: ({
@@ -309,14 +323,14 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models */ "./src/models/index.js");
+/* harmony import */ var _models_song__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models/song */ "./src/models/song.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   Query: {
-    songs: async () => _models__WEBPACK_IMPORTED_MODULE_0__["song"].find({}).populate(),
+    songs: async () => _models_song__WEBPACK_IMPORTED_MODULE_0__["default"].find({}).populate(),
     song: async (_, {
       _id
-    }) => _models__WEBPACK_IMPORTED_MODULE_0__["song"].findById({
+    }) => _models_song__WEBPACK_IMPORTED_MODULE_0__["default"].findById({
       _id
     }).populate()
   },
@@ -459,40 +473,26 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ "express");
 /* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! mongoose */ "mongoose");
-/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _config_apollo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./config/apollo */ "./src/config/apollo.js");
-/* harmony import */ var _config_config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./config/config */ "./src/config/config.js");
-/* harmony import */ var _config_logger__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./config/logger */ "./src/config/logger.js");
-/* harmony import */ var _config_express__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./config/express */ "./src/config/express.js");
+/* harmony import */ var passport__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! passport */ "passport");
+/* harmony import */ var passport__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(passport__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _utilities_logger__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utilities/logger */ "./src/utilities/logger.js");
+/* harmony import */ var _servers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./servers */ "./src/servers/index.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./config */ "./src/config/index.js");
 
-
- // import connect from './config/connection';
 
 
 
 
 const app = express__WEBPACK_IMPORTED_MODULE_0___default()();
-const port = _config_config__WEBPACK_IMPORTED_MODULE_3__["default"].port || 4000;
-
-const connect = () => {
-  mongoose__WEBPACK_IMPORTED_MODULE_1___default.a.connect(_config_config__WEBPACK_IMPORTED_MODULE_3__["default"].dbHost, _config_config__WEBPACK_IMPORTED_MODULE_3__["default"].mongo.options);
-  return mongoose__WEBPACK_IMPORTED_MODULE_1___default.a.connection;
+const server = {
+  start: async () => {
+    Object(_servers__WEBPACK_IMPORTED_MODULE_3__["default"])(app, passport__WEBPACK_IMPORTED_MODULE_1___default.a, _config__WEBPACK_IMPORTED_MODULE_4__["default"]);
+    app.listen(_config__WEBPACK_IMPORTED_MODULE_4__["default"].port, () => {
+      _utilities_logger__WEBPACK_IMPORTED_MODULE_2__["default"].info(`App started on http://localhost:${_config__WEBPACK_IMPORTED_MODULE_4__["default"].port}`);
+    });
+  }
 };
-
-const listen = () => {
-  if (app.get('env') === 'test') return;
-  app.listen(port);
-  _config_logger__WEBPACK_IMPORTED_MODULE_4__["default"].info(`App started on http://localhost:${port}`);
-};
-
-const connection = connect();
-Object(_config_express__WEBPACK_IMPORTED_MODULE_5__["default"])(app);
-_config_apollo__WEBPACK_IMPORTED_MODULE_2__["default"].applyMiddleware({
-  app,
-  path: '/graphql'
-});
-connection.on('error', err => _config_logger__WEBPACK_IMPORTED_MODULE_4__["default"].error(err)).on('disconnected', connect).on('open', listen);
+server.start();
 
 /***/ }),
 
@@ -526,33 +526,7 @@ const artistSchema = new Schema({
   }]
 });
 artistSchema.plugin(mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1___default.a);
-const Artist = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('Artist', artistSchema);
-/* harmony default export */ __webpack_exports__["default"] = (Artist);
-
-/***/ }),
-
-/***/ "./src/models/index.js":
-/*!*****************************!*\
-  !*** ./src/models/index.js ***!
-  \*****************************/
-/*! exports provided: song, playlist, artist */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _playlist__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./playlist */ "./src/models/playlist.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "playlist", function() { return _playlist__WEBPACK_IMPORTED_MODULE_0__["default"]; });
-
-/* harmony import */ var _artist__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./artist */ "./src/models/artist.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "artist", function() { return _artist__WEBPACK_IMPORTED_MODULE_1__["default"]; });
-
-/* harmony import */ var _song__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./song */ "./src/models/song.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "song", function() { return _song__WEBPACK_IMPORTED_MODULE_2__["default"]; });
-
-
-
-
-
+/* harmony default export */ __webpack_exports__["default"] = (mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('Artist', artistSchema));
 
 /***/ }),
 
@@ -591,8 +565,7 @@ const playlistSchema = new Schema({
   }]
 });
 playlistSchema.plugin(mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1___default.a);
-const Playlist = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('Playlist', playlistSchema);
-/* harmony default export */ __webpack_exports__["default"] = (Playlist);
+/* harmony default export */ __webpack_exports__["default"] = (mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('Playlist', playlistSchema));
 
 /***/ }),
 
@@ -629,8 +602,227 @@ const songSchema = new Schema({
   favourite: Boolean
 });
 songSchema.plugin(mongoose_autopopulate__WEBPACK_IMPORTED_MODULE_1___default.a);
-const Song = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('Song', songSchema);
-/* harmony default export */ __webpack_exports__["default"] = (Song);
+/* harmony default export */ __webpack_exports__["default"] = (mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('Song', songSchema));
+
+/***/ }),
+
+/***/ "./src/models/user.js":
+/*!****************************!*\
+  !*** ./src/models/user.js ***!
+  \****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mongoose */ "mongoose");
+/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var bcrypt__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! bcrypt */ "bcrypt");
+/* harmony import */ var bcrypt__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bcrypt__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _utilities_logger__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utilities/logger */ "./src/utilities/logger.js");
+
+
+
+const {
+  Schema
+} = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a;
+const userSchema = new Schema({
+  username: {
+    type: String,
+    required: true
+  },
+  name: {
+    type: String
+  },
+  email: {
+    type: String
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false
+  },
+  created_at: Date,
+  updated_at: Date
+});
+userSchema.pre('save', next => {
+  if (!undefined.isModified('password')) return next();
+  undefined.password = bcrypt__WEBPACK_IMPORTED_MODULE_1___default.a.hashSync(undefined.password, 10);
+  return next();
+});
+
+userSchema.methods.verifyPassword = async (plain, cipher) => {
+  const comparison = await bcrypt__WEBPACK_IMPORTED_MODULE_1___default.a.compare(plain, cipher).catch(err => _utilities_logger__WEBPACK_IMPORTED_MODULE_2__["default"].error(err));
+  return comparison;
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('User', userSchema));
+
+/***/ }),
+
+/***/ "./src/servers/apollo.js":
+/*!*******************************!*\
+  !*** ./src/servers/apollo.js ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var apollo_server_express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! apollo-server-express */ "apollo-server-express");
+/* harmony import */ var apollo_server_express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(apollo_server_express__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _graphql_schema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../graphql/schema */ "./src/graphql/schema/index.js");
+/* harmony import */ var _graphql_resolvers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../graphql/resolvers */ "./src/graphql/resolvers/index.js");
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = (new apollo_server_express__WEBPACK_IMPORTED_MODULE_0__["ApolloServer"]({
+  introspection: true,
+  typeDefs: _graphql_schema__WEBPACK_IMPORTED_MODULE_1__["default"],
+  resolvers: _graphql_resolvers__WEBPACK_IMPORTED_MODULE_2__["default"],
+  formatError: error => {
+    const message = error.message.replace('SequelizeValidationError: ', '').replace('Validation error: ', '');
+    return { ...error,
+      message
+    };
+  }
+}));
+
+/***/ }),
+
+/***/ "./src/servers/database.js":
+/*!*********************************!*\
+  !*** ./src/servers/database.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mongoose */ "mongoose");
+/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_0__);
+
+
+const connect = async ({
+  config
+}) => {
+  const options = {
+    useCreateIndex: true,
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  };
+  return mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.connect(config.dbHost, options);
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (connect);
+
+/***/ }),
+
+/***/ "./src/servers/express.js":
+/*!********************************!*\
+  !*** ./src/servers/express.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var body_parser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! body-parser */ "body-parser");
+/* harmony import */ var body_parser__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(body_parser__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var helmet__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! helmet */ "helmet");
+/* harmony import */ var helmet__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(helmet__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var cors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! cors */ "cors");
+/* harmony import */ var cors__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(cors__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _config_passport_local__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../config/passport/local */ "./src/config/passport/local.js");
+/* harmony import */ var _config_passport_jwt__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../config/passport/jwt */ "./src/config/passport/jwt.js");
+/* harmony import */ var _api_routes__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../api/routes */ "./src/api/routes/index.js");
+
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = (async (app, passport) => {
+  passport.use(_config_passport_local__WEBPACK_IMPORTED_MODULE_3__["default"]);
+  passport.use(_config_passport_jwt__WEBPACK_IMPORTED_MODULE_4__["default"]);
+  app.use(helmet__WEBPACK_IMPORTED_MODULE_1___default()());
+  app.use(cors__WEBPACK_IMPORTED_MODULE_2___default()());
+  app.use(body_parser__WEBPACK_IMPORTED_MODULE_0___default.a.urlencoded({
+    extended: true
+  }));
+  app.use(body_parser__WEBPACK_IMPORTED_MODULE_0___default.a.json());
+  Object(_api_routes__WEBPACK_IMPORTED_MODULE_5__["default"])(app, passport);
+});
+
+/***/ }),
+
+/***/ "./src/servers/index.js":
+/*!******************************!*\
+  !*** ./src/servers/index.js ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./express */ "./src/servers/express.js");
+/* harmony import */ var _apollo__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./apollo */ "./src/servers/apollo.js");
+/* harmony import */ var _database__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./database */ "./src/servers/database.js");
+
+
+
+
+const loader = async (app, passport, config) => {
+  await Object(_database__WEBPACK_IMPORTED_MODULE_2__["default"])({
+    config
+  });
+  await Object(_express__WEBPACK_IMPORTED_MODULE_0__["default"])(app, passport);
+  _apollo__WEBPACK_IMPORTED_MODULE_1__["default"].applyMiddleware({
+    app,
+    path: '/graphql'
+  });
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (loader);
+
+/***/ }),
+
+/***/ "./src/utilities/logger.js":
+/*!*********************************!*\
+  !*** ./src/utilities/logger.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var winston__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! winston */ "winston");
+/* harmony import */ var winston__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(winston__WEBPACK_IMPORTED_MODULE_0__);
+
+const {
+  combine,
+  colorize,
+  simple,
+  json
+} = winston__WEBPACK_IMPORTED_MODULE_0__["format"];
+const logger = Object(winston__WEBPACK_IMPORTED_MODULE_0__["createLogger"])({
+  level: 'silly',
+  format: json(),
+  transports: [new winston__WEBPACK_IMPORTED_MODULE_0__["transports"].File({
+    filename: 'error.log',
+    level: 'error'
+  }), new winston__WEBPACK_IMPORTED_MODULE_0__["transports"].File({
+    filename: 'combined.log'
+  })]
+});
+
+if (true) {
+  logger.add(new winston__WEBPACK_IMPORTED_MODULE_0__["transports"].Console({
+    format: combine(colorize(), simple())
+  }));
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (logger);
 
 /***/ }),
 
@@ -657,6 +849,17 @@ module.exports = require("apollo-server-express");
 
 /***/ }),
 
+/***/ "bcrypt":
+/*!*************************!*\
+  !*** external "bcrypt" ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("bcrypt");
+
+/***/ }),
+
 /***/ "body-parser":
 /*!******************************!*\
   !*** external "body-parser" ***!
@@ -668,14 +871,25 @@ module.exports = require("body-parser");
 
 /***/ }),
 
-/***/ "envy":
+/***/ "cors":
 /*!***********************!*\
-  !*** external "envy" ***!
+  !*** external "cors" ***!
   \***********************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = require("envy");
+module.exports = require("cors");
+
+/***/ }),
+
+/***/ "dotenv":
+/*!*************************!*\
+  !*** external "dotenv" ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("dotenv");
 
 /***/ }),
 
@@ -701,6 +915,17 @@ module.exports = require("helmet");
 
 /***/ }),
 
+/***/ "jsonwebtoken":
+/*!*******************************!*\
+  !*** external "jsonwebtoken" ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("jsonwebtoken");
+
+/***/ }),
+
 /***/ "mongoose":
 /*!***************************!*\
   !*** external "mongoose" ***!
@@ -720,6 +945,39 @@ module.exports = require("mongoose");
 /***/ (function(module, exports) {
 
 module.exports = require("mongoose-autopopulate");
+
+/***/ }),
+
+/***/ "passport":
+/*!***************************!*\
+  !*** external "passport" ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("passport");
+
+/***/ }),
+
+/***/ "passport-jwt":
+/*!*******************************!*\
+  !*** external "passport-jwt" ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("passport-jwt");
+
+/***/ }),
+
+/***/ "passport-local":
+/*!*********************************!*\
+  !*** external "passport-local" ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("passport-local");
 
 /***/ }),
 

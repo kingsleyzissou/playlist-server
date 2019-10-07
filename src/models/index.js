@@ -1,5 +1,13 @@
-import playlist from './playlist';
-import artist from './artist';
-import song from './song';
+import Playlist from './playlist';
+import Artist from './artist';
+import Song from './song';
+import User from './user';
 
-export { song, playlist, artist };
+const models = [
+  { name: 'user', model: User },
+  { name: 'playlist', model: Playlist },
+  { name: 'artist', model: Artist },
+  { name: 'song', model: Song },
+];
+
+export default models;

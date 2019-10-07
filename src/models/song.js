@@ -20,6 +20,4 @@ const songSchema = new Schema({
 
 songSchema.plugin(populate);
 
-const Song = mongoose.model('Song', songSchema);
-
-export default Song;
+export default mongoose.model('Song', songSchema);

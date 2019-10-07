@@ -24,6 +24,4 @@ const playlistSchema = new Schema({
 
 playlistSchema.plugin(populate);
 
-const Playlist = mongoose.model('Playlist', playlistSchema);
-
-export default Playlist;
+export default mongoose.model('Playlist', playlistSchema);

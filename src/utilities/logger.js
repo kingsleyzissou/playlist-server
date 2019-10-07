@@ -3,7 +3,7 @@ import { createLogger, transports, format } from 'winston';
 const { combine, colorize, simple, json } = format;
 
 const logger = createLogger({
-  level: 'debug',
+  level: 'silly',
   format: json(),
   transports: [
     new transports.File({ filename: 'error.log', level: 'error' }),

@@ -19,6 +19,4 @@ const artistSchema = new Schema({
 
 artistSchema.plugin(populate);
 
-const Artist = mongoose.model('Artist', artistSchema);
-
-export default Artist;
+export default mongoose.model('Artist', artistSchema);

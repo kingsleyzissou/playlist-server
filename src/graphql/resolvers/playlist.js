@@ -1,10 +1,10 @@
-import { playlist } from '../../models';
+import Playlist from '../../models/playlist';
 
 export default {
 
   Query: {
-    playlist: async (_, { _id }) => playlist.findById({ _id }),
-    playlists: async () => playlist.find({}),
+    playlist: async (_, { _id }) => Playlist.findById({ _id }),
+    playlists: async () => Playlist.find({}),
   },
 
   Playlist: {
